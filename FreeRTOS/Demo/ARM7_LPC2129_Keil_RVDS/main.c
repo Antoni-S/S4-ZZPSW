@@ -9,7 +9,14 @@ int main(void){
 	Led_Init();
 	while(1){
 		Led_Toggle(0);
-		Delay(500);
+		Led_Toggle(1);
+		Delay(125);
+		Led_Toggle(1);
+		Delay(125);
+		Led_Toggle(1);
+		Delay(125);
+		Led_Toggle(1);
+		Delay(125);
 	}
 
 }
