@@ -6,3 +6,7 @@ FreeRTOS/Demo/ARM7_LPC2129_Keil_RVDS/bin/RTOSDemo.lnp
 FreeRTOS/Demo/ARM7_LPC2129_Keil_RVDS/bin/*.d
 FreeRTOS/Demo/ARM7_LPC2129_Keil_RVDS/bin/*.o
 FreeRTOS/Demo/ARM7_LPC2129_Keil_RVDS/*.lst
+
+*.uvgui*
+*.bak
+*.dep

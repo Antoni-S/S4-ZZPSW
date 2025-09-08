@@ -165,6 +165,7 @@
             <Capability>1</Capability>
             <DriverSelection>4096</DriverSelection>
           </Flash1>
+          <bUseTDR>0</bUseTDR>
           <Flash2>BIN\UL2ARM.DLL</Flash2>
           <Flash3>"LPC210x_ISP.EXE" ("#H" ^X $D COM1: 9600 1)</Flash3>
           <Flash4></Flash4>
@@ -397,24 +398,14 @@
               <FilePath>.\Startup.s</FilePath>
             </File>
             <File>
-              <FileName>ParTest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\ParTest\ParTest.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>serial.c</FileName>
+              <FileName>led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\serial\serial.c</FilePath>
-            </File>
-            <File>
-              <FileName>serialISR.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\serial\serialISR.s</FilePath>
+              <FilePath>.\led.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -450,41 +441,6 @@
               <FileName>portASM.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\..\Source\portable\RVDS\ARM7_LPC21xx\portASM.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Stadard Demo</GroupName>
-          <Files>
-            <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>comtest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\comtest.c</FilePath>
-            </File>
-            <File>
-              <FileName>BlockQ.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\BlockQ.c</FilePath>
-            </File>
-            <File>
-              <FileName>dynamic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\dynamic.c</FilePath>
-            </File>
-            <File>
-              <FileName>PollQ.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\PollQ.c</FilePath>
-            </File>
-            <File>
-              <FileName>semtest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\semtest.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -601,7 +557,7 @@
             <Oh166RecLen>16</Oh166RecLen>
           </OPTHX>
           <Simulator>
-            <UseSimulator>0</UseSimulator>
+            <UseSimulator>1</UseSimulator>
             <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
             <RunToMain>1</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
@@ -612,7 +568,7 @@
             <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
           </Simulator>
           <Target>
-            <UseTarget>1</UseTarget>
+            <UseTarget>0</UseTarget>
             <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
             <RunToMain>1</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
@@ -649,6 +605,7 @@
             <Capability>1</Capability>
             <DriverSelection>4096</DriverSelection>
           </Flash1>
+          <bUseTDR>0</bUseTDR>
           <Flash2>BIN\UL2ARM.DLL</Flash2>
           <Flash3>"LPC210x_ISP.EXE" ("#H" ^X $D COM1: 9600 1)</Flash3>
           <Flash4></Flash4>
@@ -881,24 +838,14 @@
               <FilePath>.\Startup.s</FilePath>
             </File>
             <File>
-              <FileName>ParTest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\ParTest\ParTest.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>serial.c</FileName>
+              <FileName>led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\serial\serial.c</FilePath>
-            </File>
-            <File>
-              <FileName>serialISR.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\serial\serialISR.s</FilePath>
+              <FilePath>.\led.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -934,41 +881,6 @@
               <FileName>portASM.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\..\Source\portable\RVDS\ARM7_LPC21xx\portASM.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Stadard Demo</GroupName>
-          <Files>
-            <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>comtest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\comtest.c</FilePath>
-            </File>
-            <File>
-              <FileName>BlockQ.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\BlockQ.c</FilePath>
-            </File>
-            <File>
-              <FileName>dynamic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\dynamic.c</FilePath>
-            </File>
-            <File>
-              <FileName>PollQ.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\PollQ.c</FilePath>
-            </File>
-            <File>
-              <FileName>semtest.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Common\Minimal\semtest.c</FilePath>
             </File>
           </Files>
         </Group>
