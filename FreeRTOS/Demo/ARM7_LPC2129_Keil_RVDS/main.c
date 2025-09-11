@@ -2,43 +2,25 @@
 #include "task.h"
 #include "led.h"
 
-
-
-typedef struct {
-	unsigned char ucBlinkingFreq;
-	unsigned char ucActiveLed;
-} sCtrlLed;
-
-sCtrlLed myCtrlLed;
-
-void Delay(unsigned int uiMiliSec) {
-	unsigned int uiLoopCtr, uiDelayLoopCount;
-	uiDelayLoopCount = uiMiliSec*12000;
-	for(uiLoopCtr=0;uiLoopCtr<uiDelayLoopCount;uiLoopCtr++){}
-}
+xTaskHandle xMyHandle;
 
 void LedBlink( void *pvParameters ){
-	sCtrlLed *myLedParam = (sCtrlLed*)pvParameters;
+	unsigned char ucFreq = *((unsigned char*)pvParameters);
 	while(1){
-		Led_Toggle(myLedParam -> ucActiveLed);
-		vTaskDelay((1000/myLedParam -> ucBlinkingFreq)/2);
+		Led_Toggle(0);
+		vTaskDelay((1000/ucFreq)/2);
 	}
 }
 
-void LedCtrl (void *pvParameters) {
-	unsigned char ucSecondCounter = 0;
-	sCtrlLed *myLedParam = (sCtrlLed*)pvParameters;
+void LedCtrl( void *pvParameters ) {
+	unsigned char ucTaskStatus = 0;
 	while(1) {
-		if(ucSecondCounter == 2) {
-			myLedParam -> ucActiveLed == 4 ? (myLedParam -> ucActiveLed = 0) : myLedParam -> ucActiveLed++;
-			ucSecondCounter = 0;
+		if(ucTaskStatus) {
+			vTaskSuspend(xMyHandle);
+			ucTaskStatus = 0;
 		} else {
-			ucSecondCounter++;
-		}
-		if(myLedParam -> ucBlinkingFreq == 10) {
-			myLedParam -> ucBlinkingFreq = 1;
-		} else {
-			myLedParam -> ucBlinkingFreq++;
+			vTaskResume(xMyHandle);
+			ucTaskStatus = 1;
 		}
 		vTaskDelay(1000);
 	}
@@ -46,11 +28,12 @@ void LedCtrl (void *pvParameters) {
 
 int main( void )
 {
+	unsigned char ucBlinkingFreq = 10;
+	
 	Led_Init();
-	myCtrlLed.ucActiveLed = 0;
-	myCtrlLed.ucBlinkingFreq = 1;
-	xTaskCreate(LedCtrl, NULL, 100, &myCtrlLed, 2, NULL);
-	xTaskCreate(LedBlink, NULL , 100 , &myCtrlLed, 2 , NULL );
+	
+	xTaskCreate(LedCtrl, NULL , 100 , &ucBlinkingFreq, 2, &xMyHandle);
+	xTaskCreate(LedBlink, NULL , 100 , &ucBlinkingFreq, 2, &xMyHandle);
 	vTaskStartScheduler();
 	while(1);
 }
