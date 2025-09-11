@@ -32,7 +32,7 @@ int main( void )
 	
 	Led_Init();
 	
-	xTaskCreate(LedCtrl, NULL , 100 , &ucBlinkingFreq, 2, &xMyHandle);
+	xTaskCreate(LedCtrl, NULL , 100 , &ucBlinkingFreq, 2, NULL);
 	xTaskCreate(LedBlink, NULL , 100 , &ucBlinkingFreq, 2, &xMyHandle);
 	vTaskStartScheduler();
 	while(1);
