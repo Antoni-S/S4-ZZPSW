@@ -4,17 +4,32 @@
 #include "semphr.h"
 
 xTaskHandle xMyHandle;
+xSemaphoreHandle xSemaphore;
 
+void PulseTrigger( void *pvParameters ){
+	while(1) {
+		xSemaphoreGive(xSemaphore);
+		vTaskDelay(1000);
+	}
+}
 
+void Pulse_LED0 (void *pvParameters) {
+	while(1) {
+		if(xSemaphoreTake(xSemaphore, portMAX_DELAY) == pdTRUE) {
+			Led_Set(0);
+			vTaskDelay(100);
+			Led_Clr(0);
+		}
+	}
+}
 
 int main( void )
 {
-	unsigned char ucBlinkingFreq = 10;
-	
 	Led_Init();
+	vSemaphoreCreateBinary(xSemaphore);
 	
-	xTaskCreate(, NULL , 100 , &ucBlinkingFreq, 2, NULL);
-	xTaskCreate(, NULL , 100 , &ucBlinkingFreq, 2, &xMyHandle);
+	xTaskCreate(PulseTrigger, NULL , 100 , NULL, 2, NULL);
+	xTaskCreate(Pulse_LED0, NULL , 100 , NULL, 2, NULL);
 	vTaskStartScheduler();
 	while(1);
 }
