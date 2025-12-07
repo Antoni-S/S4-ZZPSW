@@ -13,34 +13,27 @@ void PulseTrigger( void *pvParameters ){
 	}
 }
 
-void Pulse_LED0 (void *pvParameters) {
+void Pulse_LED (void *pvParameters) {
 	while(1) {
 		if(xSemaphoreTake(xSemaphore, portMAX_DELAY) == pdTRUE) {
-			Led_Set(0);
+			Led_Set(*(unsigned char*)pvParameters);
 			vTaskDelay(100);
-			Led_Clr(0);
-		}
-	}
-}
-
-void Pulse_LED1 (void *pvParameters) {
-	while(1) {
-		if(xSemaphoreTake(xSemaphore, portMAX_DELAY) == pdTRUE) {
-			Led_Set(1);
-			vTaskDelay(100);
-			Led_Clr(1);
+			Led_Clr(*(unsigned char*)pvParameters);
 		}
 	}
 }
 
 int main( void )
 {
+	unsigned char ucLed0 = 0;
+	unsigned char ucLed1 = 1;
+	
 	Led_Init();
 	vSemaphoreCreateBinary(xSemaphore);
 	
 	xTaskCreate(PulseTrigger, NULL , 100 , NULL, 2, NULL);
-	xTaskCreate(Pulse_LED0, NULL , 100 , NULL, 2, NULL);
-	xTaskCreate(Pulse_LED1, NULL , 100 , NULL, 2, NULL);
+	xTaskCreate(Pulse_LED, NULL , 100 , &ucLed0, 2, NULL);
+	xTaskCreate(Pulse_LED, NULL , 100 , &ucLed1, 2, NULL);
 	vTaskStartScheduler();
 	while(1);
 }
