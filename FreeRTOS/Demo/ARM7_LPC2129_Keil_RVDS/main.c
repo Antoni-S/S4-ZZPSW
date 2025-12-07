@@ -23,6 +23,14 @@ void Pulse_LED0 (void *pvParameters) {
 	}
 }
 
+void PulseTrigger_delay (void *pvParameters) {
+	vTaskDelay(1000/3);
+	while(1) {
+		xSemaphoreGive(xSemaphore);
+		vTaskDelay(1000/3);
+	}
+}
+
 int main( void )
 {
 	Led_Init();
@@ -30,6 +38,7 @@ int main( void )
 	
 	xTaskCreate(PulseTrigger, NULL , 100 , NULL, 2, NULL);
 	xTaskCreate(Pulse_LED0, NULL , 100 , NULL, 2, NULL);
+	xTaskCreate(PulseTrigger_delay, NULL , 100 , NULL, 2, NULL);
 	vTaskStartScheduler();
 	while(1);
 }
