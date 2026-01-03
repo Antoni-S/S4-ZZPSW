@@ -16,8 +16,18 @@ void Rtos_Transmiter_SendString (char cMessage[]) {
 }
 
 void LettersTx (void *pvParameters){
+	char cMessage[32];
+	TickType_t TickStart, TickStop, TickLength;
+	CopyString("-ABCDEFGH-:", cMessage);
+	
 	while(1){
-		Rtos_Transmiter_SendString("-ABCDEFGH-\n");
+		TickStart = xTaskGetTickCount();
+		Rtos_Transmiter_SendString(cMessage);
+		CopyString("-ABCDEFGH-:", cMessage);
+		TickStop = xTaskGetTickCount();
+		TickLength = TickStop - TickStart;
+		AppendUIntToString(TickLength, cMessage);
+		AppendString("\n", cMessage);
 		vTaskDelay(300);
 	}
 }
