@@ -7,12 +7,19 @@
 #include "keyboard.h"
 
 xSemaphoreHandle xSemaphore;
+QueueHandle_t xQueue;
 
-void Rtos_Transmiter_SendString (char cMessage[]) {
-	xSemaphoreTake(xSemaphore, portMAX_DELAY);
-	Transmiter_SendString(cMessage);
-	while (eTransmiter_GetStatus()!=FREE){};
-	xSemaphoreGive(xSemaphore);
+void Rtos_Transmiter_SendString (void *pvParameters) {
+	char cMessage[32];
+	while(1) {
+		if(xQueueReceive(xQueue, cMessage, portMAX_DELAY) == pdPASS) {
+			xSemaphoreTake(xSemaphore, portMAX_DELAY);
+			Transmiter_SendString(cMessage);
+			while (eTransmiter_GetStatus()!=FREE){};
+			xSemaphoreGive(xSemaphore);
+		}
+		vTaskDelay(30);
+	}
 }
 
 void LettersTx (void *pvParameters){
@@ -22,22 +29,22 @@ void LettersTx (void *pvParameters){
 	
 	while(1){
 		TickStart = xTaskGetTickCount();
-		Rtos_Transmiter_SendString(cMessage);
+		xQueueSend(xQueue, cMessage, portMAX_DELAY);
 		CopyString("-ABCDEFGH-:", cMessage);
 		TickStop = xTaskGetTickCount();
 		TickLength = TickStop - TickStart;
 		AppendUIntToString(TickLength, cMessage);
 		AppendString("\n", cMessage);
-		vTaskDelay(300);
+		vTaskDelay(600);
 	}
 }
 
 void KeyboardTx (void *pvParameters) {
 	while(1){
 		if(eKeyboardRead() != RELEASED) {
-			Rtos_Transmiter_SendString("-KEYBOARD-\n");
+			xQueueSend(xQueue, "-KEYBOARD-\n", portMAX_DELAY);
 		}
-		vTaskDelay(300);
+		vTaskDelay(30);
 	}
 }
 
@@ -45,8 +52,12 @@ int main( void ){
 	UART_InitWithInt(300);
 	KeyboardInit();
 	vSemaphoreCreateBinary(xSemaphore);
+	xSemaphoreGive(xSemaphore);
+	xQueue = xQueueCreate(5,32);
+	
 	xTaskCreate(LettersTx, NULL, 128, NULL, 1, NULL );
 	xTaskCreate(KeyboardTx, NULL, 128, NULL, 1, NULL);
+	xTaskCreate(Rtos_Transmiter_SendString, NULL, 128, NULL, 1, NULL);
 	vTaskStartScheduler();
 	while(1);
 }
