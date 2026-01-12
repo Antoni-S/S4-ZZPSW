@@ -29,13 +29,15 @@ void LettersTx (void *pvParameters){
 	
 	while(1){
 		TickStart = xTaskGetTickCount();
+		if(xQueueSend(xQueue, cMessage, portMAX_DELAY) != pdPASS)
+			Led_Toggle(0);
 		xQueueSend(xQueue, cMessage, portMAX_DELAY);
 		CopyString("-ABCDEFGH-:", cMessage);
 		TickStop = xTaskGetTickCount();
 		TickLength = TickStop - TickStart;
 		AppendUIntToString(TickLength, cMessage);
 		AppendString("\n", cMessage);
-		vTaskDelay(600);
+		vTaskDelay(1000);
 	}
 }
 
@@ -54,6 +56,7 @@ int main( void ){
 	vSemaphoreCreateBinary(xSemaphore);
 	xSemaphoreGive(xSemaphore);
 	xQueue = xQueueCreate(5,32);
+	Led_Init();
 	
 	xTaskCreate(LettersTx, NULL, 128, NULL, 1, NULL );
 	xTaskCreate(KeyboardTx, NULL, 128, NULL, 1, NULL);
