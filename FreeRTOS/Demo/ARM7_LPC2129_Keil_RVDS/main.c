@@ -10,13 +10,13 @@ void Keyboard (void *pvParameters){
 				ServoCallib();
 				break;
 			case BUTTON_1:
-				ServoGoTo(50);
+				ServoGoTo(30);
 				break;
 			case BUTTON_2:
-				ServoGoTo(100);
+				ServoGoTo(60);
 				break;
 			case BUTTON_3:
-				ServoGoTo(150);
+				ServoGoTo(120);
 				break;
 			default:
 				break;

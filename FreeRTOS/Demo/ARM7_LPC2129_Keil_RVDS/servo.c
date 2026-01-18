@@ -1,12 +1,15 @@
 #include "servo.h"
 #include "led.h"
 #include "keyboard.h"
-#include "timer_interrupts.h"
 #include <LPC21xx.H>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 #define DETECTOR_bm (1<<10)
 
 enum ServoState {CALLIB, IDLE, IN_PROGRESS, OFFSET};
+static unsigned char ucServoFreq;
 
 struct Servo{
   enum ServoState eState;
@@ -97,13 +100,23 @@ void Automat(void){
         break;
       }
     }
+		
+void vServoTask(void *pvParameters) {
+	unsigned char *ucFreq = (unsigned char *)pvParameters;
+	while(1) {
+		Automat();
+		vTaskDelay(1000 / *ucFreq);
+	}
+}
     
     
-void ServoInit(unsigned int uiServoFrequency){
-  
+void ServoInit(unsigned char ucServoFrequency){
+  ucServoFreq = ucServoFrequency;
   sServo.eState = CALLIB;
   LedInit();
-  Timer1Interrupts_Init((2000/uiServoFrequency), &Automat);
+  DetectorInit();
+	
+	xTaskCreate(vServoTask, NULL, 128, &ucServoFreq, 2, NULL);
   
 }
 
