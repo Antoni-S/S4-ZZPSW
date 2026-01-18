@@ -26,7 +26,7 @@ void Keyboard (void *pvParameters){
 }
 
 int main( void ){
-	ServoInit(100);
+	ServoInit(200);
 
 	xTaskCreate(Keyboard, NULL, 128, NULL, 1, NULL);
 	vTaskStartScheduler();
