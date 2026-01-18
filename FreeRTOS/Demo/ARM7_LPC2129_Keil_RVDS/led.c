@@ -6,7 +6,7 @@
 #define LED2_bm (1<<18)
 #define LED3_bm (1<<19)
 
-void Led_Init(void) {
+void LedInit(void) {
 	IO1DIR = IO1DIR | LED0_bm | LED1_bm | LED2_bm | LED3_bm;
 	IO1SET = LED0_bm;
 }
@@ -44,7 +44,7 @@ void LedStep(enum StepDirection eLedDirection) {
 	LedOn(uiLedStep % 4);
 }
 
-void Led_Set(unsigned char ucLedIndeks)
+void LedSet(unsigned char ucLedIndeks)
 {
     switch(ucLedIndeks){
             case 0:
@@ -64,7 +64,7 @@ void Led_Set(unsigned char ucLedIndeks)
       }
 }
 
-void Led_Clr(unsigned char ucLedIndeks)
+void LedClr(unsigned char ucLedIndeks)
 {
     switch(ucLedIndeks){
             case 0:
@@ -84,15 +84,15 @@ void Led_Clr(unsigned char ucLedIndeks)
       }
 }
 
-void Led_StepLeft(void) {
+void LedStepLeft(void) {
 	LedStep(LEFT);
 }
 
-void Led_StepRight(void) {
+void LedStepRight(void) {
 	LedStep(RIGHT);
 }
 
-void Led_Toggle (unsigned char ucLedIndex) {
+void LedToggle (unsigned char ucLedIndex) {
 	int iLedMask = 0;
 		switch(ucLedIndex) {
 		case 0:
