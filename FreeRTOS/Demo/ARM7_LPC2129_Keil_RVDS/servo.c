@@ -123,6 +123,9 @@ void ServoInit(unsigned char ucServoFrequency){
   
 }
 
+void ServoWait(unsigned int uiTicksToWait) {
+	vTaskDelay(uiTicksToWait);
+};
 
 void ServoCallib(void){
   sServo.eState = CALLIB;

@@ -19,6 +19,7 @@ void Keyboard (void *pvParameters){
 			case BUTTON_3:
 				for(i = 1; i <= 3; i++) {
 					ServoGoTo(12*i);
+					ServoWait(100*i);
 					ServoGoTo(0);
 				}
 				break;
