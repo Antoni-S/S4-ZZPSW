@@ -5,7 +5,6 @@
 
 void Keyboard (void *pvParameters){
 	while(1){
-		unsigned char i = 1;
 		switch(eKeyboardRead()){
 			case BUTTON_0:
 				ServoCallib();
@@ -17,11 +16,17 @@ void Keyboard (void *pvParameters){
 				ServoGoTo(60);
 				break;
 			case BUTTON_3:
-				for(i = 1; i <= 3; i++) {
-					ServoGoTo(12*i);
-					ServoWait(100*i);
-					ServoGoTo(0);
-				}
+				ServoSpeed(30);
+				ServoGoTo(12);
+			
+				ServoSpeed(20);
+				ServoGoTo(24);
+			
+				ServoSpeed(15);
+				ServoGoTo(36);
+			
+				ServoSpeed(6);
+				ServoGoTo(0);
 				break;
 			default:
 				break;
@@ -31,7 +36,7 @@ void Keyboard (void *pvParameters){
 }
 
 int main( void ){
-	ServoInit(200);
+	ServoInit(100);
 
 	xTaskCreate(Keyboard, NULL, 128, NULL, 1, NULL);
 	vTaskStartScheduler();

@@ -8,8 +8,9 @@
 
 #define DETECTOR_bm (1<<10)
 
-enum ServoState {CALLIB, IDLE, IN_PROGRESS, OFFSET};
-static unsigned char ucServoFreq;
+enum ServoInstr {GOTO, WAIT, SPEED, CAL};
+enum ServoState {CALLIB, IDLE, IN_PROGRESS};
+static unsigned char ucDelay;
 QueueHandle_t xQueue;
 
 struct Servo{
@@ -18,8 +19,12 @@ struct Servo{
   unsigned int uiDesiredPosition;
 };
 
-struct Servo sServo;
+struct Instruction {
+	enum ServoInstr eInstr;
+	unsigned int uiInstrValue;
+};
 
+struct Servo sServo;
 
 void DetectorInit(void){
   IO0DIR = IO0DIR&(~(DETECTOR_bm));
@@ -37,101 +42,114 @@ enum DetectorState eReadDetector(){
   }
 }
 
-
 void Automat(void){
-    unsigned int uiOffset = 0;
-    switch(sServo.eState){
-      
-      case CALLIB:
-        
-        if(eReadDetector() == INACTIVE){
-          LedStepLeft();
-          sServo.eState = CALLIB;
-        }
-        else{
-          sServo.uiCurrentPosition = 0;
-          sServo.uiDesiredPosition = 0;
-          sServo.eState = OFFSET;
-        }
-        break;
-        
-        
-      case OFFSET:
-        
-        if(sServo.uiCurrentPosition == uiOffset){
-          sServo.uiCurrentPosition = 0;
-          sServo.uiDesiredPosition = 0;
-          sServo.eState = IDLE;
-        }
-        else{
-          LedStepLeft();
-          sServo.uiCurrentPosition++;
-        }
-        break;
-        
-      case IDLE:
-        xQueueReceive(xQueue, &sServo.uiDesiredPosition, 0);
-        if(sServo.uiCurrentPosition != sServo.uiDesiredPosition){ 
-          sServo.eState = IN_PROGRESS;
-        }
-        else{
-          sServo.eState = IDLE;
-        }
-        break;
+	struct Instruction sControl;
+	
+	switch(sServo.eState){
+		
+		case CALLIB:
+			
+			if(eReadDetector() == INACTIVE){
+				LedStepLeft();
+			}
+			else{
+				sServo.uiCurrentPosition = 0;
+				sServo.eState = IDLE;
+			}
+			break;
+			
+		case IDLE:
+			if(xQueueReceive(xQueue, &sControl, 0) == pdPASS) {
+				switch(sControl.eInstr) {
+					case GOTO:
+						sServo.uiDesiredPosition = sControl.uiInstrValue;
+						sServo.eState = IN_PROGRESS;
+						break;
+					
+					case WAIT:
+						vTaskDelay(sControl.uiInstrValue);
+						break;
+					
+					case SPEED:
+						ucDelay = sControl.uiInstrValue;
+						break;
+					
+					case CAL:
+						sServo.eState = CALLIB;
+						break;
+					
+					default:
+						break;
+				}
+			}
+			break;
 
-      case IN_PROGRESS:
-        
-        if(sServo.uiCurrentPosition < sServo.uiDesiredPosition){
-          
-          LedStepRight();
-          sServo.uiCurrentPosition++;
-          sServo.eState = IN_PROGRESS;
-          
-        }
-        else if(sServo.uiCurrentPosition>sServo.uiDesiredPosition){
-          
-          LedStepLeft();
-          sServo.uiCurrentPosition--;
-          sServo.eState = IN_PROGRESS;
-          
-        }
-        else{
-          sServo.eState = IDLE;
-        }
-        break;
-      }
-    }
+		case IN_PROGRESS:
+			
+			if(sServo.uiCurrentPosition < sServo.uiDesiredPosition){
+				
+				LedStepRight();
+				sServo.uiCurrentPosition++;
+				
+			}
+			else if(sServo.uiCurrentPosition > sServo.uiDesiredPosition){
+				
+				LedStepLeft();
+				sServo.uiCurrentPosition--;
+				
+			}
+			else{
+				sServo.eState = IDLE;
+			}
+			break;
+	}
+}
 		
 void vServoTask(void *pvParameters) {
-	unsigned char *ucFreq = (unsigned char *)pvParameters;
+	ucDelay = 1000/(*(unsigned char*)pvParameters);
 	while(1) {
 		Automat();
-		vTaskDelay(1000 / *ucFreq);
+		vTaskDelay(ucDelay);
 	}
 }
     
     
 void ServoInit(unsigned char ucServoFrequency){
-  ucServoFreq = ucServoFrequency;
+  static unsigned char ucFrequency;
+	ucFrequency = ucServoFrequency;
+	
+	LedInit();
+	DetectorInit();
   sServo.eState = CALLIB;
-  LedInit();
-  DetectorInit();
 	
-	xQueue = xQueueCreate(5, 8);
+	xQueue = xQueueCreate(5, sizeof(struct Instruction));
 	
-	xTaskCreate(vServoTask, NULL, 128, &ucServoFreq, 2, NULL);
-  
+	xTaskCreate(vServoTask, NULL, 128, &ucFrequency, 2, NULL);
 }
 
 void ServoWait(unsigned int uiTicksToWait) {
-	vTaskDelay(uiTicksToWait);
+	struct Instruction sControl;
+	sControl.eInstr = WAIT;
+	sControl.uiInstrValue = uiTicksToWait;
+	xQueueSend(xQueue, &sControl, portMAX_DELAY);
 };
 
-void ServoCallib(void){
-  sServo.eState = CALLIB;
-}
-
+void ServoSpeed(unsigned int uiSpeed) {
+	struct Instruction sControl;
+	sControl.eInstr = SPEED;
+	sControl.uiInstrValue = uiSpeed;
+	xQueueSend(xQueue, &sControl, portMAX_DELAY);
+};
     
 void ServoGoTo(unsigned int uiPosition){
-  xQueueSend(xQueue, &uiPosition, portMAX_DELAY);
+	struct Instruction sControl;
+	sControl.eInstr = GOTO;
+	sControl.uiInstrValue = uiPosition;
+  xQueueSend(xQueue, &sControl, portMAX_DELAY);
+}
+
+void ServoCallib(void){
+	struct Instruction sControl;
+	sControl.eInstr = CAL;
+  xQueueSend(xQueue, &sControl, portMAX_DELAY);
 }
