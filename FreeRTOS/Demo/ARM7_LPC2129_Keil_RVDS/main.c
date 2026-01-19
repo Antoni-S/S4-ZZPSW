@@ -5,6 +5,7 @@
 
 void Keyboard (void *pvParameters){
 	while(1){
+		unsigned char i = 1;
 		switch(eKeyboardRead()){
 			case BUTTON_0:
 				ServoCallib();
@@ -16,7 +17,10 @@ void Keyboard (void *pvParameters){
 				ServoGoTo(60);
 				break;
 			case BUTTON_3:
-				ServoGoTo(120);
+				for(i = 1; i <= 3; i++) {
+					ServoGoTo(12*i);
+					ServoGoTo(0);
+				}
 				break;
 			default:
 				break;
