@@ -10,6 +10,7 @@
 
 enum ServoState {CALLIB, IDLE, IN_PROGRESS, OFFSET};
 static unsigned char ucServoFreq;
+QueueHandle_t xQueue;
 
 struct Servo{
   enum ServoState eState;
@@ -69,7 +70,7 @@ void Automat(void){
         break;
         
       case IDLE:
-        
+        xQueueReceive(xQueue, &sServo.uiDesiredPosition, 0);
         if(sServo.uiCurrentPosition != sServo.uiDesiredPosition){ 
           sServo.eState = IN_PROGRESS;
         }
@@ -116,6 +117,8 @@ void ServoInit(unsigned char ucServoFrequency){
   LedInit();
   DetectorInit();
 	
+	xQueue = xQueueCreate(5, 8);
+	
 	xTaskCreate(vServoTask, NULL, 128, &ucServoFreq, 2, NULL);
   
 }
@@ -127,5 +130,5 @@ void ServoCallib(void){
 
     
 void ServoGoTo(unsigned int uiPosition){
-  sServo.uiDesiredPosition = uiPosition;
+  xQueueSend(xQueue, &uiPosition, portMAX_DELAY);
 }
